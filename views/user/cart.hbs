@@ -1,0 +1,314 @@
+
+	 	<section class="shopping-cart dark">
+	 		<div class="container">
+		        <div class="block-heading">
+		          <h2>Shopping Cart</h2>
+		          
+		        </div>
+		        <div class="content">
+	 				<div class="row">
+	 					<div class="col-md-12 col-lg-8 ">
+	 						<div class="items">
+                                {{#each products}}
+				 				<div class="product "  style=" margin: 0;padding-left: 0;">
+				 					<div class="row">
+										
+					 					<div class="col-md-3 ">
+					 						<img class="img-fluid mx-auto d-block image" src="/product-images/{{this.product._id}}.jpg">
+					 					</div>
+					 					<div class="col-md-8 	margin-0">
+					 						<div class="info">
+						 						<div class="row">
+							 						<div class="col-md-5 product-name ">
+							 							<div class="product-name">
+								 							<p>{{this.product.Name}}</p>
+															
+								 							<div class="product-info">
+									 							<div>CATEGORY: <span class="value">{{this.product.Category}}</span></div>
+									 							<div>DESCRIPTION: <span class="value">{{this.product.Description}}</span></div>
+									 						</div>
+									 					</div>
+							 						</div>
+							 						
+                                                    <div class="col-md-4 quantity  mr-0">
+                                                       <label for="quantity">Quantity:</label>
+                                                        <div class="d-flex align-items-center">
+                                                            <button class="cart-item-count mr-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1,'{{../user}}')">-</button>
+                                                             <span id="{{this.product._id}}">{{this.quantity}}</span>
+                                                            <button class="cart-item-count ml-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1,'{{../user}}')">+</button>
+															
+                                                        </div>
+                                                    </div>
+
+													<div class="col-md-3">
+													  <div class="row align-items-center">
+    													<div class="col-8">
+													      <span class="price">{{this.product.price}}</span>
+    													</div>
+    												  <div class="col-4">
+      													<button class="btn delete-btn" onclick="deleteProduct('{{this._id}}','{{this.product._id}}')">delete</button>
+    												  </div>
+  													</div>
+												  </div>
+
+												</div>
+							 				</div>
+					 					</div>
+					 				</div>
+				 				</div>
+				 				 {{/each}}
+				 			</div>
+			 			</div>
+			 			<div class="col-md-12 col-lg-4">
+			 				<div class="summary">
+			 					<h3>Summary</h3>
+			 					<div class="summary-item"><span class="text">Subtotal</span><span id="myptotal" class="price">{{totalValue}}</span></div>
+								<div class="summary-item"><span class="text">Discount</span><span id="mydiscount" class="mydiscount price">40</span></div>
+								<div class="summary-item"><span class="text">Shipping</span><span id="myshipping" class="myshipping price">50</span></div>
+								<div class="summary-item"><span class="text">Total</span><span id="total" class="mytotal price">{{totalValue}}</span></div>
+
+			 					<button id="checkoutBtn" type="button" href="/place-order" class="btn btn-primary btn-lg btn-block">Checkout</button>
+				 			</div>
+			 			</div>
+		 			</div> 
+		 		</div>
+	 		</div>
+		</section>
+
+<script>
+
+
+	function changeQuantity(cartId,proId,count,userid)
+	{
+		let quantity=parseInt(document.getElementById(proId).innerHTML)
+		count=parseInt(count)
+		$.ajax
+		(
+			{
+				url:'/change-product-quantity',
+				data:
+				{
+					cart:cartId,
+					product:proId,
+					count:count,
+					quantity:quantity,
+					user:userid
+				},
+				method:'post',
+				success:(response)=>
+				{
+					if(response.removeProduct)
+					{
+						alert('product removed from cart')
+						location.reload()
+					}
+					else
+					{
+							
+						document.getElementById(proId).innerHTML=quantity+count;
+						
+						document.getElementById('myptotal').innerHTML=response.total
+						updateTotalValue('myptotal', 'mydiscount', 'myshipping', 'total');
+
+					}
+				}
+			}
+		)
+	}
+	window.addEventListener('DOMContentLoaded', function() {
+  updateTotalValue('myptotal', 'mydiscount', 'myshipping', 'total');
+});
+
+
+	function updateTotalValue(ptotalId, discountId, shippingId, totalId) {
+  // Get the values of ptotal, discount, and shipping
+  let ptotalValue = parseFloat(document.getElementById(ptotalId).innerHTML);
+  let discountValue = parseFloat(document.getElementById(discountId).innerHTML);
+  let shippingValue = parseFloat(document.getElementById(shippingId).innerHTML);
+
+  // Calculate the total value
+  let totalValue = ptotalValue - discountValue + shippingValue;
+
+  // Set the total value in the HTML element
+  {{!-- document.getElementById("total").innerHTML = "$" + (totalValue - discountValue + shippingValue); --}}
+	  document.getElementById(totalId).innerHTML = totalValue;
+}
+
+
+
+	</script><script>
+	function deleteProduct(cartId,proId)
+	{
+		$.ajax
+		(
+			{
+				url:'/delete-product',
+				data:
+				{
+					cart:cartId,
+					product:proId
+				},
+				method:'post',
+				success:(Response)=>
+				{
+					alert("product removed from cart")
+					location.reload()
+				}
+			}
+		)
+	}
+	{{!-- <script> --}}
+  var checkoutBtn = document.getElementById("checkoutBtn");
+  checkoutBtn.addEventListener("click", function() {
+    window.location.href = "/place-order";
+  });
+{{!-- </script> --}}
+
+</script>
+{{!-- 
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> --}}
+
+<style>
+	#checkoutBtn{
+  margin: 0;
+  padding: 0;
+}
+
+    .shopping-cart{
+	padding-bottom: 50px;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.shopping-cart.dark{
+	background-color: #f6f6f6;
+}
+
+.shopping-cart .content{
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.075);
+	background-color: white;
+}
+
+.shopping-cart .block-heading{
+    padding-top: 50px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.shopping-cart .block-heading p{
+	text-align: center;
+	max-width: 420px;
+	margin: auto;
+	opacity:0.7;
+}
+
+.shopping-cart .dark .block-heading p{
+	opacity:0.8;
+}
+
+.shopping-cart .block-heading h1,
+.shopping-cart .block-heading h2,
+.shopping-cart .block-heading h3 {
+	margin-bottom:1.2rem;
+	color: #3b99e0;
+}
+
+.shopping-cart .items{
+	margin: auto;
+}
+
+.shopping-cart .items .product{
+	margin-bottom: 20px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.shopping-cart .items .product .info{
+	padding-top: 0px;
+	text-align: center;
+}
+
+.shopping-cart .items .product .info .product-name{
+	font-weight: 600;
+}
+
+.shopping-cart .items .product .info .product-name .product-info{
+	font-size: 14px;
+	margin-top: 15px;
+}
+
+.shopping-cart .items .product .info .product-name .product-info .value{
+	font-weight: 400;
+}
+
+.shopping-cart .items .product .info .quantity .quantity-input{
+    margin: auto;
+    width: 60px;
+}
+
+.shopping-cart .items .product .info .price{
+	margin-top: 15px;
+    font-weight: bold;
+    font-size: 22px;
+ }
+
+.shopping-cart .summary{
+	border-top: 2px solid #5ea4f3;
+    background-color: #f7fbff;
+    height: 100%;
+    padding: 30px;
+}
+
+.shopping-cart .summary h3{
+	text-align: center;
+	font-size: 1.3em;
+	font-weight: 600;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.shopping-cart .summary .summary-item:not(:last-of-type){
+	padding-bottom: 10px;
+	padding-top: 10px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.shopping-cart .summary .text{
+	font-size: 1em;
+	font-weight: 600;
+}
+
+.shopping-cart .summary .price{
+	font-size: 1em;
+	float: right;
+}
+
+.shopping-cart .summary button{
+	margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+	.shopping-cart .items .product .info {
+		padding-top: 25px;
+		text-align: left; 
+	}
+
+	.shopping-cart .items .product .info .price {
+		font-weight: bold;
+		font-size: 22px;
+		top: 17px; 
+	}
+
+	.shopping-cart .items .product .info .quantity {
+		text-align: center; 
+		max-width:fit-content;
+		height:fit-content
+	}
+	.shopping-cart .items .product .info .quantity .quantity-input {
+		padding:0;
+		text-align: center; 
+	}
+}
+ 
+
+</style>

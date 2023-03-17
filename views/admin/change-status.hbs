@@ -1,0 +1,91 @@
+<section id="change-order-status" class="bg-gradient-primary text- py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col ">
+        <button class="btn btn-primary" onclick="window.location.href = '/admin/orders'">back</button>
+        <h2 class="text-center mb-4">Change Order Status</h2>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Method</th>
+              </tr>
+            </thead>
+            <tbody>
+                 {{#if orderDetails}}
+    {{!-- {{#each orderDetails.products}} --}}
+      {{#each orderDetails.product_details}}
+        <tr>
+          <td>{{this.Name}}</td>
+          <td>{{this.price}}</td>
+          
+          <td class="status-cell">{{../orderDetails.status}}</td>
+          <td >{{../orderDetails.paymentMethod}}</td>
+        </tr>
+      {{/each}}
+    {{!-- {{/each}} --}}
+  {{else}}
+  <tr>
+    <td colspan="4">No products found.</td>
+  </tr>
+{{/if}}
+            </tbody> 
+          </table>
+        </div>
+        {{!-- <form method="post" action='/admin/orders/change-status?id={{orderId}}'> --}}
+          <div class="form-group mt-4">
+            <label for="order-status-select">Order Status</label>
+            <select class="form-control" id="order-status-select" name="order-status">
+              <option value="shipped">Shipped</option>
+              <option value="dispatched">Dispatched</option>
+              <option value="delivered">Delivered</option>
+            </select>
+          </div>
+          <div class="text-center">
+            <button onclick="changeStatus('{{orderId}}')"  class="btn btn-success mt-2 " name="change-status">Change Status</button>
+          </div>
+        {{!-- </form> --}}
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+    function changeStatus(orderId)
+    {
+        var statusCells = document.getElementsByClassName("status-cell");
+  
+  // Loop through all status cells and update the one that matches the productId
+  for (var i = 0; i < statusCells.length; i++) {
+    var productId = statusCells[i].getAttribute("data-product-id");
+    if (productId === orderId) {
+      statusCells[i].innerHTML = selectedValue;
+      break; // Stop looping after updating the status cell
+    }
+  }
+  
+        console.log("function is escecuting")
+        var selectedValue = document.getElementById("order-status-select").value;
+        $.ajax
+        (
+            {
+                url:'/admin/orders/change-status',
+                data:
+                {
+                    id:orderId,
+                    status:selectedValue
+                },
+                method:'post',
+                success:(response)=>
+                {
+                    {{!-- document.getElementsByClassName('status-cell').innerHTML = selectedValue; --}}
+                     $('.status-cell').text(selectedValue);
+
+                }
+            },
+            
+        )
+    }
+</script>

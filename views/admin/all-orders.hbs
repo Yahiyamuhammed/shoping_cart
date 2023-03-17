@@ -1,0 +1,34 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">no.</th>
+      <th scope="col">customer name</th>
+      <th scope="col">total price</th>
+      <th scope="col">order status</th>
+      <th scope="col">payement mode</th>
+      <th scope="col">order placed on</th>
+      <th scope="col">operations</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each orders}}
+    <tr>
+      <td>{{@index}}</td>
+      <td>
+        {{#if ../selected}}
+          {{this.user.name}}
+        {{else}}
+          
+          <a href="/admin/user/order?id={{this.user._id}}">{{this.user.name}}</a>
+        {{/if}}
+      </td>
+      <td>{{this.totalAmnt}}</td>
+      <td>{{this.status}}</td>
+      <td>{{this.paymentMethod}}</td>
+      <td>{{this.date}}</td>
+      <td><button class="btn btn-primary" onclick="window.location.href='/admin/orders/change-status?id={{this._id}}'">change status</button></td>
+    </tr>
+    {{/each}}
+    
+  </tbody>
+</table>

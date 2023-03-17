@@ -1,0 +1,61 @@
+<form class="form-horizontal" enctype="multipart/form-data" action="/admin/add-product" method="post">
+<fieldset>
+
+<!-- Form Name -->
+<legend>PRODUCTS</legend>
+
+<!-- Text input-->
+
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="product_name">PRODUCT NAME</label>  
+  <div class="col-md-4">
+  <input id="product_name" name="Name" placeholder="PRODUCT NAME" class="form-control input-md" required="" type="text">
+    
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="product_categorie">PRODUCT CATEGORY</label>  
+  <div class="col-md-4">
+  <input id="product_categorie" name="Category" placeholder="product_categorie" class="form-control input-md" required="" type="text">
+    
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label" for="price">PRICE</label>  
+  <div class="col-md-4">
+  <input id="price" name="price" placeholder="price" class="form-control input-md" required="" type="number">
+    
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="product_name_fr">PRODUCT DESCRIPTION FR</label>  
+  <div class="col-md-4">
+  <input id="product_name_fr" name="Description" placeholder="PRODUCT DESCRIPTION FR" class="form-control input-md" required="" type="text">
+    
+  </div>
+</div>
+<!-- File Button --> 
+<div class="form-group">
+  <label class="col-md-4 control-label" for="image">IMAGE</label>
+  <div class="col-md-4">
+    <input id="image" name="image" class="input-file" type="file">
+  </div>
+</div>
+
+ 
+<!-- Button -->
+<div class="form-group">
+  <div class="col-md-4">
+    <button type="submit" class="btn btn-primary">submit</button>
+  </div>
+  </div>
+
+</fieldset>
+</form>
