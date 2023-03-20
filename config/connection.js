@@ -29,7 +29,8 @@ const state = {
 };
 
 // mongodb connection string
-const url = "mongodb+srv://zaiba:YjNdYHR4hDTlRniN@y-tasks.mcoz60a.mongodb.net/?retryWrites=true&w=majority";
+// const url = "mongodb+srv://zaiba:YjNdYHR4hDTlRniN@y-tasks.mcoz60a.mongodb.net/?retryWrites=true&w=majority";
+const url = "mongodb://127.0.0.1:27017";
 // database name
 const dbName = "shopping";
 

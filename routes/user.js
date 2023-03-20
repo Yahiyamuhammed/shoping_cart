@@ -24,7 +24,7 @@ router.get('/',async function(req, res, next) {
     cartCount=await userHelpers.getCartCount(req.session.user._id)
   }
   let user=req.session.user;
-  console.log(user);
+  // console.log(user);
   productHelper.getAllProducts().then((products)=>
   {
   //  console.log(products);  
@@ -38,11 +38,17 @@ router.get('/login',(req,res)=>
   if(req.session.user)
   {
     res.redirect('/');
+    
   }
   else
   {
+    console.log("logging");
+
     res.render('user/user-login',{loginErr:req.session.userLoginErr});
+    // console.log("err");
     req.session.userLoginErr=false;
+
+
   }
 });
 router.get('/signup',(req,res)=>
@@ -103,7 +109,7 @@ router.get('/cart',verifyLogin,async(req,res)=>
   console.log(totalValue);
   res.render('user/cart',{products,user,totalValue})
 });
-router.get('/add-to-cart/:id',(req,res)=>
+router.get('/add-to-cart/:id',verifyLogin,(req,res)=>
 {
   console.log('api call');
   userHelpers.addToCart(req.params.id,req.session.user._id).then(()=>

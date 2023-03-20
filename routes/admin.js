@@ -8,7 +8,7 @@ const { response } = require('express');
 var objectId=require('mongodb').ObjectId;
 // const { ObjectId } = require('mongodb');
 /* GET users listing. */
-const verifyLogin=(req,res,next)=>
+const verifyLoginadmin=(req,res,next)=>
 {
   // console.log(req.session);
   if(req.session.adminLoggedIn)
@@ -130,7 +130,7 @@ router.post('/edit-products/:id',(req,res)=>
   })
 })
 
-router.get('/orders',verifyLogin,(req,res)=>
+router.get('/orders',verifyLoginadmin,(req,res)=>
 {
   productHeplers.getOrders().then((orders)=>
   {
@@ -198,7 +198,7 @@ router.post('/orders/change-status',(req,res)=>
   // res.render('admin/change-status',{admin:true,id})
   // console.log(req.body);
 })
-router.get('/users',verifyLogin,(req,res)=>
+router.get('/users',verifyLoginadmin,(req,res)=>
 {
   productHeplers.getUsers().then((response)=>
   {
