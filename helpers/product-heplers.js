@@ -3,6 +3,7 @@ var collection=require('../config/collection');
 const { resolve } = require('promise');
 var objectId=require('mongodb').ObjectId;
 var bcrypt=require('bcrypt');
+const fs = require('fs');
 module.exports={
     addProduct:(product,callback)=>
     {
@@ -26,9 +27,19 @@ module.exports={
         return new Promise((resolve,reject)=>
         { 
             console.log(proId);
-            console.log(objectId(proId));
+            // console.log(objectId(proId));
+           
          db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id:new objectId(proId)}).then((response)=>
          {
+        
+
+          fs.unlink(`./public/product-images/${proId}.jpg`, (err) => {
+              if (err) {
+                  throw err;
+              }
+          
+              console.log("Delete File successfully.");
+          });
               console.log(response);
                 resolve(response)
          })
@@ -247,6 +258,43 @@ module.exports={
       //   console.log(usr);
       //   resolve(user)
       // })
+    },
+    cropImage:(image)=>
+    {
+      // get the uploaded file
+$image = $_FILES['image']['tmp_name'];
+
+// create an image resource from the uploaded file
+$source_image = imagecreatefromjpeg($image);
+
+// get the desired dimensions for the cropped image
+$crop_width = 200;
+$crop_height = 200;
+
+// get the dimensions of the source image
+$source_width = imagesx($source_image);
+$source_height = imagesy($source_image);
+
+// calculate the coordinates for the top-left corner of the cropped image
+$crop_x = ($source_width - $crop_width) / 2;
+$crop_y = ($source_height - $crop_height) / 2;
+
+// create a new image resource for the cropped image
+$cropped_image = imagecreatetruecolor($crop_width, $crop_height);
+
+// crop the source image to the desired dimensions
+imagecopy($cropped_image, $source_image, 0, 0, $crop_x, $crop_y, $crop_width, $crop_height);
+
+// save the cropped image to disk
+$filename = 'cropped.jpg';
+imagejpeg($cropped_image, $filename);
+
+// free up memory by destroying the image resources
+imagedestroy($source_image);
+imagedestroy($cropped_image);
+
+resolve(err,done)
+
     }
 
 }

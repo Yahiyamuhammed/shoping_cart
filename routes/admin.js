@@ -84,10 +84,11 @@ router.get('/add-product',function(req,res)
 router.post('/add-product',function(req,res)
 {
   console.log(req.body);
-  console.log(req.files?.image);
+  // console.log(req.files?.image);
   productHelper.addProduct(req.body,(insertedId)=>
   {
     let image=req.files.image
+    // productHeplers.cropImage(image).then((err,done)=>
     image.mv(`./public/product-images/${insertedId}.jpg`,(err,done)=>
       {
         if(!err)
