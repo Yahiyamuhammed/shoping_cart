@@ -15,7 +15,12 @@ function addToCart(proId)
                     count=parseInt(count)+1;
                     $('#cart-count').html(count)
                 }
-            }
+            },
+            error: (xhr) => {
+                if (xhr.status === 401) {
+                  window.location.href = '/login';
+                }
+              }
         }
     )
 }

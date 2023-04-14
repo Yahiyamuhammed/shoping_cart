@@ -9,11 +9,17 @@ var userHelpers = require('../helpers/user-helpers');
 const verifyLogin=(req,res,next)=>
 {
   // console.log(req.session);
-  if(req.session.userLoggedIn)
-    next()
-  else
+  if(req.session.userLoggedIn){
+    console.log('eser exist');
+    next()}
+    else {
+      if (req.xhr) {
+        res.status(401).json({ message: 'User not logged in' });
+      }
+  else{
     res.redirect('/login')
-}
+    console.log('no user');}
+}}
 /* GET home page. */
 
 router.get('/',async function(req, res, next) {
@@ -38,12 +44,12 @@ router.get('/login',(req,res)=>
   if(req.session.user)
   {
     res.redirect('/');
+    console.log("redirecting");
     
   }
   else
   {
     console.log("logging");
-
     res.render('user/user-login',{loginErr:req.session.userLoginErr});
     // console.log("err");
     req.session.userLoginErr=false;
@@ -54,7 +60,8 @@ router.get('/login',(req,res)=>
 router.get('/signup',(req,res)=>
 {
   console.log(req.body);
-  res.render('user/user-signup')
+  res.render('user/user-signup',{signupErr:req.session.usersignupErr});
+  req.session.usersignupErr=false;
 })
 router.post('/signup',(req,res)=>
 {
@@ -66,14 +73,17 @@ router.post('/signup',(req,res)=>
   // })
   console.log(req.body);
   userHelpers.doSignup(req.body).then((response) => {
-    console.log(JSON.stringify(response) +" this is also response");
+    // console.log(JSON.stringify(response) +" this is also response");
     if (response) {
       req.session.user = response;
       req.session.userLoggedIn = true;
+      console.log("craeted acc");
       // console.log(response+" this is response");
-      res.redirect('/');
+      res.json({status:true});
     } else {
-      res.redirect('/signup');
+      console.log("account already");
+      req.session.usersignupErr="email already exists you can try logging in";
+      res.json({status:false});
     }
   })
 });
@@ -109,14 +119,13 @@ router.get('/cart',verifyLogin,async(req,res)=>
   console.log(totalValue);
   res.render('user/cart',{products,user,totalValue})
 });
-router.get('/add-to-cart/:id',verifyLogin,(req,res)=>
-{
+router.get('/add-to-cart/:id',verifyLogin,async(req,res)=>
+{ 
   console.log('api call');
-  userHelpers.addToCart(req.params.id,req.session.user._id).then(()=>
+  await userHelpers.addToCart(req.params.id,req.session.user._id).then(()=>
   {
     res.json({status:true})
-    
-  })
+    })
 });
 
 router.post('/change-product-quantity',(req,res,next)=>
@@ -198,6 +207,20 @@ router.post('/verify-payment',(req,res)=>
   {
     console.log("payment feiled");
     res.json({status:false,errmsg:''})
+  })
+})
+
+router.get('/forgot-password',(req,res)=>
+{
+  res.render('user/forgot-password')
+})
+router.post('/forgot-password',(req,res)=>
+{
+  console.log(req.body);
+  userHelpers.forgotPassword(req.body.email).then(()=>
+  {
+    console.log("forgot success");
+    res.render('user/forgot-password')
   })
 })
 

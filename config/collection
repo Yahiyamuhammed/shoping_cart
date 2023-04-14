@@ -4,5 +4,6 @@ module.exports=
     USER_COLLECTION:'user',
     CART_COLLECTION:'cart',
     ORDER_COLLECTION:'order',
-    ADMIN_COLLECTION:'admin'
+    ADMIN_COLLECTION:'admin',
+    PASSWORD_RESET:'password_reset_token'
 }

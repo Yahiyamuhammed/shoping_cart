@@ -17,14 +17,24 @@ module.exports=
     {
         return new Promise(async(resolve,reject)=>
         {
-            userData.password=await bcrypt.hash(userData.password,10)
-            db.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>
+            console.log("this is user data email "+userData.email);
+            if(await db.get().collection(collection.USER_COLLECTION).findOne({email:userData.email}))
             {
-                // data.status=true
-                userData._id = data.insertedId;
-                resolve(userData);
-                // console.log(data.insertedId);
-            })
+                console.log("email exists");
+                resolve()
+            }
+            else{
+
+                console.log("creating account");
+                    userData.password=await bcrypt.hash(userData.password,10)
+                    db.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>
+                    {
+                        // data.status=true
+                        userData._id = data.insertedId;
+                        resolve(userData);
+                        // console.log(data.insertedId);
+                    })
+                }
         });
        
     },
@@ -424,6 +434,21 @@ module.exports=
                 {
                     resolve()
                 })
+        })
+    },
+    forgotPassword:(email)=>
+    {
+        return new Promise (async(resolve,reject)=>
+        {
+            console.log("this is email  "+email);
+
+           
+            
+            // if(await db.get().collection(collection.USER_COLLECTION).findOne({email:email}))
+            //  console.log("email found");
+            // else
+            //     console.log("not found");
+            resolve()
         })
     }
 }

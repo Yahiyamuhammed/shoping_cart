@@ -20,9 +20,10 @@
         "mongodb": "^5.0.1",
         "morgan": "~1.9.1",
         "multer": "^1.4.5-lts.1",
+        "nodemailer": "^6.9.1",
         "paypal-rest-sdk": "^1.8.1",
         "promise": "^8.3.0",
-        "razorpay": "^2.8.6",
+        "razorpay": "^0.0.0",
         "scrollreveal": "^4.0.9"
     }
 }
