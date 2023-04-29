@@ -4,7 +4,26 @@ var bcrypt=require('bcrypt');
 const { Db, LEGAL_TLS_SOCKET_OPTIONS, ObjectId } = require('mongodb');
 const { reject, resolve } = require('promise');
 var objectId=require('mongodb').ObjectId;
+var crypto = require('crypto');
 const Razorpay = require('razorpay');
+const jwt = require('jsonwebtoken');
+
+const nodemailer = require("nodemailer");
+
+let transporter = nodemailer.createTransport({
+    // This is the SMTP mail server to use for notifications.
+    // GCDS uses this mail server as a relay host.
+    host: "smtp.gmail.com",
+    // SMTP is unlike most network protocols, which only have a single port number.
+    // Instead, there are several different ports that can be used for different purposes.
+    port: 465,
+    secure: true,
+    auth: {
+        user: "y29186135@gmail.com",
+        pass: "tumrbdaejvgktyuv"
+    }
+});
+
 
 var instance = new Razorpay({
   key_id: 'rzp_test_yu7Vb5aVrryDu9',
@@ -402,7 +421,7 @@ module.exports=
         return new Promise ((resolve,reject)=>
         {
             // console.log(order['payment[razorpay_order_id]']+' this is vrfy pymnt');
-            var crypto = require('crypto');
+            
             
             var hmac = crypto.createHmac('sha256','b67TY1nAk93eWHE8cpoluM14');
             hmac.update(order['payment[razorpay_order_id]'] + "|" + order['payment[razorpay_payment_id]']);
@@ -436,19 +455,114 @@ module.exports=
                 })
         })
     },
-    forgotPassword:(email)=>
+    
+  
+  
+    forgetPassword:(email,res)=>
+    {
+        return new Promise(async(resolve,reject)=>
+        {
+            const user=await db.get().collection(collection.USER_COLLECTION).findOne({email:email})
+        
+    
+            if (!user) {
+          
+            res.render('user/forgot-password', { error: 'Email address not found' });
+            console.log("user noot found");
+            return;
+
+            } else {
+                console.log("user found");
+            // Generate a unique token for the password reset link
+            const token = crypto.randomBytes(20).toString('hex');
+            console.log(token);
+            // Store the token and the expiration time in the database
+            const resetToken = {
+                email: email,
+                token: token,
+                expires: Date.now() + 3600000 // Token expires in 1 hour
+            }
+
+            db.get().collection(collection.PASSWORD_RESET).insertOne(resetToken)
+               
+
+                // Send an email with the password reset link
+                const resetLink = `http://localhost:3000/reset?token=${token}`;
+               
+
+                const mailOptions = {
+                    from: 'y29186135@gmail.com',
+                    to: 'y29186135@gmail.com',
+                    subject: 'Password Reset',
+                    text: 'Hello world?', // plain text body
+                    html: `Click <a href="${resetLink}">here</a> to reset your password`
+                  };
+              
+                // console.log("ex");
+
+                            transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        return console.log(error+"thiere is an error");
+                                    }else
+                                    console.log('Message sent: %s', info.messageId);
+                                })
+              
+      
+                  // Show a success message
+                  res.render('user/forgot-password', { success: 'An email has been sent with instructions for resetting your password' });
+                // });
+              
+            }
+            resolve()
+        })
+       
+    },
+    chekToken:(token)=>
     {
         return new Promise (async(resolve,reject)=>
         {
-            console.log("this is email  "+email);
-
-           
-            
-            // if(await db.get().collection(collection.USER_COLLECTION).findOne({email:email}))
-            //  console.log("email found");
-            // else
-            //     console.log("not found");
-            resolve()
+            try {
+                const user = await db.get().collection(collection.PASSWORD_RESET).findOne({ token: token });
+                if (!user) {
+                    reject('Token not found'); // token not found
+                }
+                const tokenExpiry = new Date(user.expires);
+                const now = new Date();
+                if (now > tokenExpiry) {
+                    reject('Token expired'); // token expired
+                }
+                resolve({ email: user.email, token: user.resetToken });
+              } catch (error) {
+                reject(error);
+              }
         })
-    }
-}
+    },
+    resetPassword: (data) => {
+        return new Promise(async (resolve, reject) => {
+          const email = data.email;
+          const token = data.token;
+          const password = await bcrypt.hash(data.password, 10);
+          console.log("this is pass " + password);
+          const resetToken = await db.get()
+            .collection(collection.PASSWORD_RESET)
+            .findOne({ email: email, token: token, expires: { $gt: Date.now() } });
+      
+          if (!resetToken) {
+            // If the token is invalid or has expired, reject the promise with an error message
+            reject('Invalid or expired reset link');
+          } else {
+            // Update the user's password in the database
+            await db.get().collection(collection.USER_COLLECTION)
+              .updateOne({ email: email }, { $set: { password: password } });
+      
+            // Delete the token from the database
+            await db.get().collection(collection.PASSWORD_RESET)
+              .deleteOne({ email: email, token: token });
+      
+            // Resolve the promise with a success message
+            resolve('Your password has been reset successfully');
+          }
+        });
+      }
+      
+}   

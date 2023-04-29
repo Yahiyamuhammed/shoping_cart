@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
+
 var userRouter= require('./routes/user');
 var adminRouter= require('./routes/admin');
 
@@ -44,7 +46,6 @@ db.connect((err)=>
 
 app.use('/',userRouter);
 app.use('/admin', adminRouter);
-
 
 
 // catch 404 and forward to error handler

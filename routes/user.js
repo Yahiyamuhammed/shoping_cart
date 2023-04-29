@@ -6,6 +6,7 @@ const { resolve } = require('promise');
 var router = express.Router();
 var productHelper=require('../helpers/product-heplers');
 var userHelpers = require('../helpers/user-helpers');
+// const flash = require('express-flash');
 const verifyLogin=(req,res,next)=>
 {
   // console.log(req.session);
@@ -217,11 +218,44 @@ router.get('/forgot-password',(req,res)=>
 router.post('/forgot-password',(req,res)=>
 {
   console.log(req.body);
-  userHelpers.forgotPassword(req.body.email).then(()=>
+  userHelpers.forgetPassword(req.body.email,res).then((response)=>
   {
+    if(response)
+    {}
+    else
+      {
+        // res.render(/)
+      }
+
     console.log("forgot success");
     res.render('user/forgot-password')
+    
+  })
+});
+router.get('/reset', (req, res) => {
+  const token = req.query.token;
+  userHelpers.chekToken(token).then((resetToken)=>
+  {
+    // If the token is valid, show the reset password form
+    res.render('user/reset-password', { email: resetToken.email, token: token });
+  })
+  .catch((error) => {
+    // If the token is invalid or has expired, show an error message
+    res.render('user/reset-password', { error: error });
   })
 })
-
+router.post('/reset',(req,res)=>
+{
+  console.log(req.body);
+  // res.redirect('/login')
+  userHelpers.resetPassword(req.body).then(()=>
+  {
+    // res.render('user/user-login')
+    req.flash('success', 'Your password has been reset successfully.');
+    res.redirect('/login');
+  }).catch((error) => {
+    req.flash('error', error.message);
+    res.redirect('/reset');
+  })
+})
 module.exports = router;
