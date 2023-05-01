@@ -48,30 +48,3 @@
         </nav>
     </header>
 
-
-    <script>
-  const searchInput = document.getElementById('search-input');
-  const searchResults = document.getElementById('search-results');
-
-  searchInput.addEventListener('input', function() {
-    const query = this.value;
-
-    if (query.trim() !== '') {
-      // Send an AJAX request to the server to perform the search
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', `/search?q=${query}`);
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          // Update the search results container with the search results
-          searchResults.innerHTML = xhr.responseText;
-        } else {
-          console.error('Error performing search');
-        }
-      };
-      xhr.send();
-    } else {
-      // Clear the search results container if the search query is empty
-      searchResults.innerHTML = '';
-    }
-  });
-</script>
